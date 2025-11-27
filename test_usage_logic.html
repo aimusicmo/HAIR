@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>次数逻辑测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .status {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>次数逻辑测试页面</h1>
+    
+    <div class="test-container">
+        <h2>当前状态</h2>
+        <div id="currentStatus" class="status">加载中...</div>
+        <button class="btn" onclick="updateStatus()">刷新状态</button>
+    </div>
+
+    <div class="test-container">
+        <h2>测试操作</h2>
+        
+        <div class="test-section">
+            <h3>1. 测试每日免费次数</h3>
+            <p>每天登录获得2次免费机会</p>
+            <button class="btn" onclick="testDailyFree()">测试每日免费重置</button>
+            <button class="btn" onclick="useFreeGeneration()">使用一次免费次数</button>
+        </div>
+
+        <div class="test-section">
+            <h3>2. 测试购买次数</h3>
+            <p>模拟购买次数功能</p>
+            <input type="number" id="purchaseCount" value="5" min="1" max="100">
+            <button class="btn" onclick="testPurchase()">购买次数</button>
+        </div>
+
+        <div class="test-section">
+            <h3>3. 测试次数扣减</h3>
+            <p>测试通用次数扣减逻辑</p>
+            <button class="btn" onclick="testUseGeneration()">使用一次生成</button>
+            <button class="btn" onclick="useMultipleTimes(3)">连续使用3次</button>
+        </div>
+
+        <div class="test-section">
+            <h3>4. 测试边界情况</h3>
+            <p>测试次数为0时的行为</p>
+            <button class="btn" onclick="useAllTimes()">用完所有次数</button>
+            <button class="btn" onclick="testZeroUsage()">测试0次状态</button>
+        </div>
+
+        <div class="test-section">
+            <h3>5. 重置数据</h3>
+            <p>清除所有测试数据</p>
+            <button class="btn" onclick="clearAllData()">清除所有数据</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>操作日志</h2>
+        <div id="logContainer" class="status" style="max-height: 300px; overflow-y: auto;">
+            <div class="info">准备开始测试...</div>
+        </div>
+        <button class="btn" onclick="clearLog()">清除日志</button>
+    </div>
+
+    <script>
+        // 复制主要的次数管理函数
+        const USER_USAGE_KEY = 'hair_ai_user_usage';
+        const DAILY_FREE_KEY = 'hair_ai_daily_free';
+
+        function getUserUsage() {
+            const usage = localStorage.getItem(USER_USAGE_KEY);
+            return usage ? JSON.parse(usage) : { totalUsage: 0, purchasedUsage: 0 };
+        }
+
+        function saveUserUsage(usage) {
+            localStorage.setItem(USER_USAGE_KEY, JSON.stringify(usage));
+        }
+
+        function getDailyFreeStatus() {
+            const dailyData = localStorage.getItem(DAILY_FREE_KEY);
+            if (!dailyData) {
+                return { freeUsed: 0, totalFree: 2, date: new Date().toDateString() };
+            }
+            
+            const data = JSON.parse(dailyData);
+            const today = new Date().toDateString();
+            
+            if (data.date !== today) {
+                return { freeUsed: 0, totalFree: 2, date: today };
+            }
+            
+            return data;
+        }
+
+        function saveDailyFreeStatus(status) {
+            localStorage.setItem(DAILY_FREE_KEY, JSON.stringify(status));
+        }
+
+        function getAvailableCount() {
+            const usage = getUserUsage();
+            const dailyStatus = getDailyFreeStatus();
+            
+            const remainingFree = Math.max(0, dailyStatus.totalFree - dailyStatus.freeUsed);
+            return usage.purchasedUsage + remainingFree;
+        }
+
+        function useGeneration() {
+            const usage = getUserUsage();
+            const dailyStatus = getDailyFreeStatus();
+            
+            const remainingFree = Math.max(0, dailyStatus.totalFree - dailyStatus.freeUsed);
+            if (remainingFree > 0) {
+                dailyStatus.freeUsed++;
+                saveDailyFreeStatus(dailyStatus);
+                return true;
+            }
+            
+            if (usage.purchasedUsage > 0) {
+                usage.purchasedUsage--;
+                usage.totalUsage++;
+                saveUserUsage(usage);
+                return true;
+            }
+            
+            return false;
+        }
+
+        function purchaseUsage(count) {
+            const usage = getUserUsage();
+            usage.purchasedUsage += count;
+            usage.totalUsage += count;
+            saveUserUsage(usage);
+            return usage.purchasedUsage;
+        }
+
+        // 测试函数
+        function updateStatus() {
+            const usage = getUserUsage();
+            const dailyStatus = getDailyFreeStatus();
+            const availableCount = getAvailableCount();
+            const remainingFree = Math.max(0, dailyStatus.totalFree - dailyStatus.freeUsed);
+
+            const statusHtml = `
+                <div><strong>用户使用数据:</strong></div>
+                <div>总使用次数: ${usage.totalUsage}</div>
+                <div>购买次数: ${usage.purchasedUsage}</div>
+                <div><strong>每日免费数据:</strong></div>
+                <div>日期: ${dailyStatus.date}</div>
+                <div>已用免费次数: ${dailyStatus.freeUsed}/${dailyStatus.totalFree}</div>
+                <div>剩余免费次数: ${remainingFree}</div>
+                <div><strong>总计可用次数:</strong> ${availableCount}</div>
+            `;
+            
+            document.getElementById('currentStatus').innerHTML = statusHtml;
+            addLog('状态已更新', 'info');
+        }
+
+        function testDailyFree() {
+            // 模拟新的一天
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const oldStatus = {
+                freeUsed: 2,
+                totalFree: 2,
+                date: yesterday.toDateString()
+            };
+            saveDailyFreeStatus(oldStatus);
+            
+            addLog('已设置为昨天的数据（已用完2次免费次数）', 'info');
+            
+            // 现在获取今日状态应该重置
+            setTimeout(() => {
+                const currentStatus = getDailyFreeStatus();
+                addLog(`今日免费状态: 已用${currentStatus.freeUsed}/${currentStatus.totalFree}`, 'success');
+                updateStatus();
+            }, 100);
+        }
+
+        function useFreeGeneration() {
+            const dailyStatus = getDailyFreeStatus();
+            const remainingFree = Math.max(0, dailyStatus.totalFree - dailyStatus.freeUsed);
+            
+            if (remainingFree > 0) {
+                if (useGeneration()) {
+                    addLog(`成功使用免费次数，剩余免费: ${remainingFree - 1}`, 'success');
+                } else {
+                    addLog('使用免费次数失败', 'error');
+                }
+            } else {
+                addLog('没有免费次数可用', 'error');
+            }
+            updateStatus();
+        }
+
+        function testPurchase() {
+            const count = parseInt(document.getElementById('purchaseCount').value);
+            if (count > 0) {
+                const newCount = purchaseUsage(count);
+                addLog(`成功购买${count}次，当前购买次数: ${newCount}`, 'success');
+                updateStatus();
+            } else {
+                addLog('请输入有效的购买数量', 'error');
+            }
+        }
+
+        function testUseGeneration() {
+            const beforeCount = getAvailableCount();
+            if (useGeneration()) {
+                const afterCount = getAvailableCount();
+                addLog(`成功使用1次，可用次数: ${beforeCount} → ${afterCount}`, 'success');
+            } else {
+                addLog('使用失败，无可用的次数', 'error');
+            }
+            updateStatus();
+        }
+
+        function useMultipleTimes(times) {
+            let successCount = 0;
+            let failCount = 0;
+            
+            for (let i = 0; i < times; i++) {
+                if (useGeneration()) {
+                    successCount++;
+                } else {
+                    failCount++;
+                    break;
+                }
+            }
+            
+            addLog(`连续使用${times}次: 成功${successCount}次，失败${failCount}次`, 'info');
+            updateStatus();
+        }
+
+        function useAllTimes() {
+            const availableCount = getAvailableCount();
+            if (availableCount > 0) {
+                useMultipleTimes(availableCount);
+                addLog(`已用完所有${availableCount}次`, 'info');
+            } else {
+                addLog('当前没有可用次数', 'error');
+            }
+        }
+
+        function testZeroUsage() {
+            // 先用完所有次数
+            useAllTimes();
+            
+            setTimeout(() => {
+                const availableCount = getAvailableCount();
+                if (availableCount === 0) {
+                    if (useGeneration()) {
+                        addLog('错误：0次时仍然可以使用', 'error');
+                    } else {
+                        addLog('正确：0次时无法使用', 'success');
+                    }
+                } else {
+                    addLog(`当前可用次数不为0: ${availableCount}`, 'error');
+                }
+                updateStatus();
+            }, 500);
+        }
+
+        function clearAllData() {
+            localStorage.removeItem(USER_USAGE_KEY);
+            localStorage.removeItem(DAILY_FREE_KEY);
+            addLog('已清除所有测试数据', 'info');
+            updateStatus();
+        }
+
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '<div class="info">日志已清除</div>';
+        }
+
+        // 页面加载时更新状态
+        document.addEventListener('DOMContentLoaded', updateStatus);
+    </script>
+</body>
+</html>

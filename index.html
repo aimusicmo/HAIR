@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>森林AI发型设计</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧主菜单栏 -->
+        <div class="sidebar left-sidebar">
+            <div class="logo">
+                <h1>森林AI发型</h1>
+                <p>AI智能发型设计平台</p>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="active"><i class="fas fa-cut"></i> 发型设计</a></li>
+                    <li><a href="#" id="consultantBtn"><i class="fas fa-comments"></i> 发型咨询顾问</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-primary" id="purchaseUsageBtn">购买使用次数</button>
+                <button class="btn btn-secondary" id="helpCenterBtn" style="margin-top: 0.5rem;">帮助中心</button>
+            </div>
+        </div>
+        
+        <!-- 中间操作区域 -->
+        <div class="main-content">
+            <div class="content-header">
+                <h2>AI发型设计</h2>
+                <p>上传照片并描述你的创意想法点击"按创意生成"，或上传你想要的发型点击"按发型生成"。让AI为你设计专属发型</p>
+            </div>
+            
+            <!-- 图片上传功能 -->
+            <div class="upload-section">
+                <div class="upload-area" id="dropArea">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>拖放或点击上传照片</h3>
+                        <p>支持 JPG, PNG 格式</p>
+                        <button class="btn btn-primary" id="selectImageBtn">上传你的正面照</button>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <!-- 图片预览区域 -->
+                    <div class="preview-container" id="previewContainer" style="display: none;">
+                        <div class="image-wrapper">
+                            <img id="previewImage" src="" alt="预览图片">
+                            <div class="preview-info">
+                                <span id="fileName"></span>
+                                <button class="btn btn-secondary" id="removeImageBtn">移除图片</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 两列布局：创意想法和发型图片上传 -->
+            <div class="two-column-section">
+                <!-- 左列：创意想法输入框 -->
+                <div class="left-column">
+                    <div class="idea-section">
+                        <label for="ideaInput">你的创意想法</label>
+                        <div class="upload-area-small" id="ideaDropArea">
+                            <div class="upload-content-small idea-content">
+                                <i class="fas fa-edit upload-icon"></i>
+                                <h3>点击输入创意想法</h3>
+                                <p>详细描述你想要的发型风格、长度、颜色以及服装等...</p>
+                            </div>
+                            <div class="preview-container-small" id="ideaPreviewContainer" style="display: none;">
+                                <textarea id="ideaInput" class="idea-textarea" placeholder="详细描述你想要的发型风格、长度、颜色以及服装等..."></textarea>
+                                <div class="preview-info-small">
+                                    <button class="btn btn-secondary" id="removeIdeaBtn">清空内容</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 按钮放在输入框下方 -->
+                        <div class="generate-btn-container center-btn">
+                            <button class="btn btn-primary btn-large" id="generateHairBtn">按创意生成</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右列：发型图片上传框 -->
+                <div class="right-column">
+                    <div class="hairstyle-upload-section">
+                        <label>发型参考图片</label>
+                        <div class="upload-area-small" id="hairstyleDropArea">
+                            <div class="upload-content-small">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <h3>拖放或点击上传</h3>
+                                <p>支持 JPG, PNG 格式</p>
+                                <button class="btn btn-primary" id="selectHairstyleImageBtn">上传发型图片</button>
+                                <input type="file" id="hairstyleFileInput" accept="image/*" style="display: none;">
+                            </div>
+                            <!-- 图片预览区域 -->
+                            <div class="preview-container-small" id="hairstylePreviewContainer" style="display: none;">
+                                <div class="image-wrapper">
+                                    <img id="hairstylePreviewImage" src="" alt="预览图片">
+                                    <div class="preview-info-small">
+                                        <span id="hairstyleFileName"></span>
+                                        <button class="btn btn-secondary" id="removeHairstyleImageBtn">移除图片</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 按钮放在上传框下方 -->
+                        <div class="generate-btn-container center-btn">
+                            <button class="btn btn-primary btn-large" id="animeConvertBtn">按发型生成</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 设计效果生成展示区 -->
+            <div class="result-section">
+                <div class="result-container">
+                    <!-- 左边 2/3：主生成区域 -->
+                    <div class="main-result-box" id="mainResultBox">
+                        <div class="placeholder">
+                            <i class="fas fa-spinner"></i>
+                            <p>生成的效果将显示在这里</p>
+                        </div>
+                        <!-- 计时器容器 -->
+                        <div class="timer-container" style="display: none;">
+                            <div class="timer-message">生成需要1-3分钟，请耐心等待~</div>
+                            <div class="timer-display">00:00</div>
+                        </div>
+                    </div>
+
+                    <!-- 右边 1/3：操作按钮区域 -->
+                    <div class="action-panel">
+                        <button class="btn btn-secondary" id="cancelBtn" disabled>取消</button>
+                        <button class="btn btn-primary" id="downloadBtn" disabled>下载</button>
+                        <button class="btn btn-gold" id="hairstyleDIYBtn">发型DIY呈现方法</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧展示区 -->
+        <div class="sidebar right-sidebar">
+            <div class="gallery-header">
+                <h3>发型风格库</h3>
+                <div class="style-filter">
+                    <button class="filter-btn active">全部</button>
+                    <button class="filter-btn">短发</button>
+                    <button class="filter-btn">中长发</button>
+                    <button class="filter-btn">长发</button>
+                    <button class="filter-btn">甜美可爱</button>
+                    <button class="filter-btn">自然休闲</button>
+                    <button class="filter-btn">优雅魅惑</button>
+                </div>
+            </div>
+            
+            <!-- 发型图片库 -->
+            <div class="hairstyle-gallery" id="hairstyleGallery">
+                <div class="gallery-item" data-style="short">
+                    <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="短发风格">
+                    <div class="item-overlay">
+                        <span>短发</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-style="medium">
+                    <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="中长发风格">
+                    <div class="item-overlay">
+                        <span>中发</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-style="long">
+                    <img src="https://images.unsplash.com/photo-1605980776566-0486c3ac7617?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="长发风格">
+                    <div class="item-overlay">
+                        <span>长发</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-style="curly">
+                    <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="卷发风格">
+                    <div class="item-overlay">
+                        <span>甜美可爱</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-style="straight">
+                    <img src="https://images.unsplash.com/photo-1552642986-ccb41e7059e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="直发风格">
+                    <div class="item-overlay">
+                        <span>自然休闲</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-style="special">
+                    <img src="https://images.unsplash.com/photo-1596815064285-45ed8a9c0463?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="特殊风格">
+                    <div class="item-overlay">
+                        <span>优雅魅惑</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- 图片预览模态框 -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="大图预览">
+        </div>
+    </div>
+    
+    <!-- 发型DIY文字显示模态框 -->
+    <div class="text-modal" id="textModal">
+        <div class="text-modal-content">
+            <span class="text-close">&times;</span>
+            <div class="text-modal-header">
+                <h3>🎨 发型DIY呈现方法</h3>
+            </div>
+            <div class="text-modal-body">
+                <div id="textModalContent" class="text-content">
+                    <!-- 文字内容将在这里显示 -->
+                </div>
+            </div>
+            <div class="text-modal-footer">
+                <button class="btn btn-primary" id="downloadTextBtn">
+                    <i class="fas fa-download"></i> 下载文字图片
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 购买次数模态框 -->
+    <div class="purchase-modal" id="purchaseModal">
+        <div class="purchase-modal-content">
+            <div class="purchase-modal-header">
+                <h3>💰 购买使用次数</h3>
+                <span class="purchase-close">&times;</span>
+            </div>
+            <div class="purchase-modal-body">
+                <div class="purchase-options">
+                    <div class="purchase-option" data-price="1" data-count="1">
+                        <div class="option-header">
+                            <span class="price">¥1</span>
+                            <span class="count">1次</span>
+                        </div>
+                        <div class="option-qr-code">
+                            <div class="qr-placeholder">
+                                <i class="fas fa-qrcode"></i>
+                                <p>扫码支付1元</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="purchase-option" data-price="10" data-count="15">
+                        <div class="option-header">
+                            <span class="price">¥10</span>
+                            <span class="count">15次</span>
+                            <span class="discount">优惠</span>
+                        </div>
+                        <div class="option-qr-code">
+                            <div class="qr-placeholder">
+                                <i class="fas fa-qrcode"></i>
+                                <p>扫码支付10元</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="purchase-option" data-price="20" data-count="35">
+                        <div class="option-header">
+                            <span class="price">¥20</span>
+                            <span class="count">35次</span>
+                            <span class="discount">超值</span>
+                        </div>
+                        <div class="option-qr-code">
+                            <div class="qr-placeholder">
+                                <i class="fas fa-qrcode"></i>
+                                <p>扫码支付20元</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="purchase-tips">
+                    <p><i class="fas fa-info-circle"></i> 支付完成后，次数将自动添加到您的账户</p>
+                    <p><i class="fas fa-shield-alt"></i> 支付安全，支持微信、支付宝</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发型咨询顾问模态框 -->
+    <div class="consultant-modal" id="consultantModal">
+        <div class="consultant-modal-content">
+            <div class="consultant-modal-header">
+                <div class="consultant-header-left">
+                    <i class="fas fa-user-tie consultant-icon"></i>
+                    <h2>发型咨询顾问</h2>
+                </div>
+                <span class="consultant-close">&times;</span>
+            </div>
+            <div class="consultant-modal-body">
+                <div class="consultant-content">
+                    <div class="consultant-description">
+                        <p>如果你不知道如何在家DIY发型。</p>
+                        <p>如果你不知道如何跟发型师沟通自己的想法。</p>
+                        <p>如果你不知道如何选择适合自己的理发店或者发型师。</p>
+                        <p class="consultant-price">可以扫码添加我们的十年资深美发顾问，咨询费用每次10元。</p>
+                    </div>
+                    <div class="consultant-image">
+                        <img src="image/QQ_1763957378729.png" alt="发型咨询顾问" />
+                    </div>
+                </div>
+            </div>
+            <div class="consultant-modal-footer">
+                <button class="btn btn-secondary consultant-close-btn">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助中心模态框 -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <div class="help-header-left">
+                    <i class="fas fa-question-circle help-icon"></i>
+                    <h2>帮助中心</h2>
+                </div>
+                <span class="help-close">&times;</span>
+            </div>
+            <div class="help-modal-body">
+                <!-- 帮助标签页 -->
+                <div class="help-tabs">
+                    <button class="help-tab active" data-tab="getting-started">快速入门</button>
+                    <button class="help-tab" data-tab="usage-guide">使用指南</button>
+                    <button class="help-tab" data-tab="faq">常见问题</button>
+                    <button class="help-tab" data-tab="tips">使用技巧</button>
+                </div>
+
+                <!-- 帮助内容区域 -->
+                <div class="help-content">
+                    <!-- 快速入门 -->
+                    <div class="help-tab-content active" id="getting-started">
+                        <div class="help-section">
+                            <h3><i class="fas fa-rocket"></i> 快速入门指南</h3>
+                            <div class="help-item">
+                                <div class="help-item-header">
+                                    <div class="help-number">1</div>
+                                    <h4>上传您的正面照片</h4>
+                                </div>
+                                <p>点击主界面的上传区域，选择一张清晰的正面照片。建议使用光线充足、背景简洁的照片，这样AI能够更好地识别您的面部特征。</p>
+                            </div>
+                            <div class="help-item">
+                                <div class="help-item-header">
+                                    <div class="help-number">2</div>
+                                    <h4>选择生成方式</h4>
+                                </div>
+                                <p>您可以选择两种方式：<br>
+                                • <strong>按创意生成</strong>：在左侧输入框中详细描述您想要的发型风格、长度、颜色等<br>
+                                • <strong>按发型生成</strong>：在右侧上传您喜欢的发型参考图片</p>
+                            </div>
+                            <div class="help-item">
+                                <div class="help-item-header">
+                                    <div class="help-number">3</div>
+                                    <h4>等待AI生成</h4>
+                                </div>
+                                <p>点击生成按钮后，AI需要1-3分钟时间来处理您的请求。请耐心等待，生成过程中会显示倒计时。</p>
+                            </div>
+                            <div class="help-item">
+                                <div class="help-item-header">
+                                    <div class="help-number">4</div>
+                                    <h4>下载结果</h4>
+                                </div>
+                                <p>生成完成后，您可以预览效果，满意后点击下载按钮保存图片。如需DIY指导，可点击"发型DIY呈现方法"获取详细步骤。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 使用指南 -->
+                    <div class="help-tab-content" id="usage-guide">
+                        <div class="help-section">
+                            <h3><i class="fas fa-book"></i> 详细使用指南</h3>
+                            <div class="help-mode">
+                                <div class="mode-card">
+                                    <div class="mode-header">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <h4>创意模式</h4>
+                                    </div>
+                                    <div class="mode-content">
+                                        <p>适合有明确想法的用户，可以通过文字描述来获得个性化的发型设计。</p>
+                                        <div class="mode-example">
+                                            <strong>示例描述：</strong>
+                                            <blockquote>我想要一个及肩长度的波浪卷发，颜色是深棕色，刘海要空气刘海，整体风格要自然优雅，适合日常上班。</blockquote>
+                                        </div>
+                                        <div class="mode-tips">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>描述越详细，生成效果越精准</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mode-card">
+                                    <div class="mode-header">
+                                        <i class="fas fa-image"></i>
+                                        <h4>参考模式</h4>
+                                    </div>
+                                    <div class="mode-content">
+                                        <p>适合看到喜欢的发型图片，想要在自己脸上试看的用户。</p>
+                                        <div class="mode-example">
+                                            <strong>使用步骤：</strong>
+                                            <ul>
+                                                <li>从右侧发型库选择或上传参考图片</li>
+                                                <li>确保参考图片清晰展示发型</li>
+                                                <li>点击"按发型生成"按钮</li>
+                                                <li>等待AI适配您的面部特征</li>
+                                            </ul>
+                                        </div>
+                                        <div class="mode-tips">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>建议选择正面清晰的发型参考图</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 常见问题 -->
+                    <div class="help-tab-content" id="faq">
+                        <div class="help-section">
+                            <h3><i class="fas fa-question"></i> 常见问题解答</h3>
+                            <div class="help-grid">
+                                <div class="help-card">
+                                    <div class="help-card-icon good">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h4>生成需要多长时间？</h4>
+                                    <p>通常需要1-3分钟，具体时间取决于服务器负载和图片复杂度。请耐心等待，不要关闭页面。</p>
+                                </div>
+                                <div class="help-card">
+                                    <div class="help-card-icon good">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h4>支持哪些图片格式？</h4>
+                                    <p>支持JPG、PNG等常见图片格式。建议图片大小不超过10MB，分辨率不低于800x800像素。</p>
+                                </div>
+                                <div class="help-card">
+                                    <div class="help-card-icon bad">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <h4>生成效果不理想怎么办？</h4>
+                                    <p>可以尝试：<br>
+                                    • 使用更清晰的正面照片<br>
+                                    • 更详细地描述您的需求<br>
+                                    • 尝试不同的参考图片<br>
+                                    • 调整描述中的关键词</p>
+                                </div>
+                                <div class="help-card">
+                                    <div class="help-card-icon good">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h4>如何获得更好的效果？</h4>
+                                    <p>建议：<br>
+                                    • 使用光线充足、背景简洁的照片<br>
+                                    • 确保面部清晰可见<br>
+                                    • 描述中包含具体的长度、颜色、风格要求<br>
+                                    • 参考图片选择正面清晰的发型图</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 使用技巧 -->
+                    <div class="help-tab-content" id="tips">
+                        <div class="help-section">
+                            <h3><i class="fas fa-magic"></i> 专业使用技巧</h3>
+                            <div class="tips-container">
+                                <div class="tip-item">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="tip-content">
+                                        <h4>照片拍摄技巧</h4>
+                                        <p>选择自然光环境下拍摄，避免强烈阴影。面部正对镜头，表情自然，头发梳理整齐，这样AI能更好地识别您的特征。</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-palette"></i>
+                                    </div>
+                                    <div class="tip-content">
+                                        <h4>颜色描述技巧</h4>
+                                        <p>使用具体的颜色名称，如"深棕色"、"蜜糖色"、"亚麻金"等，避免使用"好看的颜色"等模糊描述。</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-ruler"></i>
+                                    </div>
+                                    <div class="tip-content">
+                                        <h4>长度描述技巧</h4>
+                                        <p>使用具体的长度描述，如"及肩"、"齐下巴"、"及腰"等，可以配合"层次感"、"渐变"等专业术语。</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-cut"></i>
+                                    </div>
+                                    <div class="tip-content">
+                                        <h4>风格描述技巧</h4>
+                                        <p>参考右侧发型库的风格分类，如"甜美可爱"、"自然休闲"、"优雅魅惑"等，让AI更准确理解您的需求。</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </div>
+                                    <div class="tip-content">
+                                        <h4>多次尝试技巧</h4>
+                                        <p>如果第一次效果不理想，可以调整描述关键词或更换参考图片再次尝试，每次生成都会有细微差异。</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <div class="tip-icon">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="tip-content">
+                                        <h4>结果保存技巧</h4>
+                                        <p>建议保存多个不同风格的生成结果，方便对比选择。同时可以保存对应的描述文字，便于后续调整。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="help-modal-footer">
+                <div class="help-footer-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>如有其他问题，请联系发型咨询顾问</span>
+                </div>
+                <button class="help-close-btn">
+                    <i class="fas fa-times"></i> 关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="script.js"></script>
+</body>
+</html>
