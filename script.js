@@ -53,11 +53,6 @@ class DOMCache {
         this.elements.modalImage = document.getElementById('modalImage');
         this.elements.closeModal = document.querySelector('.close');
         
-        // 购买模态框元素
-        this.elements.purchaseModal = document.getElementById('purchaseModal');
-        this.elements.purchaseCloseBtn = document.querySelector('.purchase-close');
-        this.elements.purchaseUsageBtn = document.getElementById('purchaseUsageBtn');
-        this.elements.purchaseOptions = document.querySelectorAll('.purchase-option');
         
         // 咨询顾问模态框元素
         this.elements.consultantModal = document.getElementById('consultantModal');
@@ -135,100 +130,6 @@ const TASK_TYPES = {
 // === 状态变量 ===
 let selectedFile = null;
 
-// === 用户次数管理系统 ===
-const USER_USAGE_KEY = 'hair_ai_user_usage';
-const DAILY_FREE_KEY = 'hair_ai_daily_free';
-
-// 获取用户使用次数
-function getUserUsage() {
-    const usage = localStorage.getItem(USER_USAGE_KEY);
-    return usage ? JSON.parse(usage) : { totalUsage: 0, purchasedUsage: 0 };
-}
-
-// 保存用户使用次数
-function saveUserUsage(usage) {
-    localStorage.setItem(USER_USAGE_KEY, JSON.stringify(usage));
-}
-
-// 获取今日免费使用状态
-function getDailyFreeStatus() {
-    const dailyData = localStorage.getItem(DAILY_FREE_KEY);
-    if (!dailyData) {
-        return { freeUsed: 0, totalFree: 20, date: new Date().toDateString() };
-    }
-    
-    const data = JSON.parse(dailyData);
-    const today = new Date().toDateString();
-    
-    // 如果是新的一天，重置状态（每天登录获得20次免费机会）
-    if (data.date !== today) {
-        return { freeUsed: 0, totalFree: 20, date: today };
-    }
-    
-    return data;
-}
-
-// 保存今日免费使用状态
-function saveDailyFreeStatus(status) {
-    localStorage.setItem(DAILY_FREE_KEY, JSON.stringify(status));
-}
-
-// 获取可用次数
-function getAvailableCount() {
-    const usage = getUserUsage();
-    const dailyStatus = getDailyFreeStatus();
-    
-    // 计算剩余免费次数
-    const remainingFree = Math.max(0, dailyStatus.totalFree - dailyStatus.freeUsed);
-    
-    // 总可用次数 = 购买次数 + 剩余免费次数
-    return usage.purchasedUsage + remainingFree;
-}
-
-// 使用一次（减少次数）
-function useGeneration() {
-    const usage = getUserUsage();
-    const dailyStatus = getDailyFreeStatus();
-    
-    // 首先使用免费次数
-    const remainingFree = Math.max(0, dailyStatus.totalFree - dailyStatus.freeUsed);
-    if (remainingFree > 0) {
-        dailyStatus.freeUsed++;
-        saveDailyFreeStatus(dailyStatus);
-        return true;
-    }
-    
-    // 如果没有免费次数，使用购买次数
-    if (usage.purchasedUsage > 0) {
-        usage.purchasedUsage--;
-        usage.totalUsage++;
-        saveUserUsage(usage);
-        return true;
-    }
-    
-    return false; // 没有可用次数
-}
-
-// 购买次数
-function purchaseUsage(count) {
-    const usage = getUserUsage();
-    usage.purchasedUsage += count;
-    usage.totalUsage += count;
-    saveUserUsage(usage);
-    return usage.purchasedUsage;
-}
-
-// 获取按钮提示文本
-function getButtonTooltip(type) {
-    const dailyStatus = getDailyFreeStatus();
-    const availableCount = getAvailableCount();
-    
-    if (availableCount > 0) {
-        return `可用次数为${availableCount}`;
-    } else {
-        return "可用次数为0";
-    }
-}
 
 // === 事件管理器 ===
 class EventManager {
@@ -1095,16 +996,8 @@ function showGeneratedImage(imageUrl, blob, taskType) {
     generatedImageBlob = blob;
     generatedImageUrl = imageUrl;
     
-    // 成功生成图片后扣减次数
-    if (!useGeneration()) {
-        console.error('扣减次数失败，但图片已生成');
-        // 即使扣减失败，也不影响图片显示，因为图片已经成功生成
-    } else {
-        console.log('成功扣减次数');
-    }
-    
-    // 更新按钮提示
-    updateButtonTooltips();
+    // 图片生成成功，无需扣减次数
+    console.log('图片生成成功');
     
     // 更新按钮状态
     updateButtonStates(true, false);
@@ -1114,74 +1007,6 @@ function showGeneratedImage(imageUrl, blob, taskType) {
     startTime = null;
 }
 
-// === 购买模态框功能 ===
-const purchaseModal = document.getElementById('purchaseModal');
-const purchaseCloseBtn = document.querySelector('.purchase-close');
-const purchaseUsageBtn = document.getElementById('purchaseUsageBtn');
-const purchaseOptions = document.querySelectorAll('.purchase-option');
-
-// 打开购买模态框
-function openPurchaseModal() {
-    purchaseModal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-// 关闭购买模态框
-function closePurchaseModal() {
-    purchaseModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-// 购买按钮点击事件
-purchaseUsageBtn.addEventListener('click', openPurchaseModal);
-
-// 关闭按钮点击事件
-purchaseCloseBtn.addEventListener('click', closePurchaseModal);
-
-// 点击模态框外部关闭
-purchaseModal.addEventListener('click', (e) => {
-    if (e.target === purchaseModal) {
-        closePurchaseModal();
-    }
-});
-
-// ESC键关闭
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && purchaseModal.style.display === 'block') {
-        closePurchaseModal();
-    }
-});
-
-// 购买选项点击事件
-purchaseOptions.forEach(option => {
-    option.addEventListener('click', function() {
-        const price = this.getAttribute('data-price');
-        const count = this.getAttribute('data-count');
-        
-        // 移除其他选项的选中状态
-        purchaseOptions.forEach(opt => opt.classList.remove('selected'));
-        // 添加当前选项的选中状态
-        this.classList.add('selected');
-        
-        // 显示扫码提示，不直接增加次数
-        showCustomAlert('扫码支付', `请扫描二维码支付${price}元，支付成功后次数将自动添加到您的账户`, 'fa-qrcode');
-    });
-});
-
-// 模拟扫码成功支付函数（实际应用中应该由后端推送或轮询支付状态）
-function simulatePaymentSuccess(price, count) {
-    const newCount = purchaseUsage(parseInt(count));
-    showCustomAlert('支付成功', `成功购买${count}次使用，当前可用次数：${newCount}`, 'fa-check-circle');
-    closePurchaseModal();
-    
-    // 更新按钮提示
-    updateButtonTooltips();
-}
-
-// 为测试添加手动触发支付成功的函数（实际应用中删除）
-window.testPaymentSuccess = function(price, count) {
-    simulatePaymentSuccess(price, count);
-};
 
 // 为测试添加手动触发N8N错误的函数（实际应用中删除）
 window.testN8NError = function(errorText) {
@@ -1195,74 +1020,13 @@ window.testNetworkError = function() {
     handleNetworkError(new Error('模拟网络错误'), '按创意生成');
 };
 
-// === 按钮提示功能 ===
-function updateButtonTooltips() {
-    const ideaTooltip = getButtonTooltip('idea');
-    const hairstyleTooltip = getButtonTooltip('hairstyle');
-    
-    // 更新现有的提示框内容
-    const ideaTooltipElement = document.querySelector('#ideaTooltip');
-    const hairstyleTooltipElement = document.querySelector('#hairstyleTooltip');
-    
-    if (ideaTooltipElement) {
-        ideaTooltipElement.textContent = ideaTooltip;
-    }
-    if (hairstyleTooltipElement) {
-        hairstyleTooltipElement.textContent = hairstyleTooltip;
-    }
-}
-
-// === 创建按钮提示框 ===
-function createButtonTooltip(buttonId, tooltipId) {
-    const button = document.getElementById(buttonId);
-    const container = button.closest('.generate-btn-container');
-    
-    // 创建提示框元素
-    const tooltip = document.createElement('div');
-    tooltip.className = 'button-tooltip';
-    tooltip.id = tooltipId;
-    tooltip.textContent = getButtonTooltip(buttonId === 'generateHairBtn' ? 'idea' : 'hairstyle');
-    
-    // 添加到容器中
-    container.appendChild(tooltip);
-    
-    // 鼠标悬停显示提示框
-    button.addEventListener('mouseenter', function() {
-        // 更新提示内容
-        tooltip.textContent = getButtonTooltip(buttonId === 'generateHairBtn' ? 'idea' : 'hairstyle');
-        tooltip.classList.add('show');
-    });
-    
-    // 鼠标离开隐藏提示框
-    button.addEventListener('mouseleave', function() {
-        tooltip.classList.remove('show');
-    });
-}
-
-// === 检查次数并显示购买提示 ===
-function checkUsageAndShowPurchase(type) {
-    const availableCount = getAvailableCount();
-    
-    if (availableCount <= 0) {
-        showCustomAlert('当前可用次数为0，请左下角购买次数', '当前可用次数为0，请左下角购买次数', 'fa-coins');
-        
-        return false;
-    }
-    
-    return true;
-}
-
 // === 1. "按创意生成"按钮 ===
 generateHairBtn.addEventListener('click', () => {
-    if (!checkUsageAndShowPurchase('idea')) return;
-    
     handleImageGeneration(TASK_TYPES.GENERATE_BY_IDEA);
 });
 
 // === 2. "按图片生成"按钮 ===
 animeConvertBtn.addEventListener('click', () => {
-    if (!checkUsageAndShowPurchase('hairstyle')) return;
-    
     handleHairstyleImageGeneration();
 });
 
@@ -1500,12 +1264,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初始化发型DIY按钮状态 - 页面加载时应该是禁用的
     updateButtonStates(true, true);
     
-    // 创建按钮提示框
-    createButtonTooltip('generateHairBtn', 'ideaTooltip');
-    createButtonTooltip('animeConvertBtn', 'hairstyleTooltip');
-    
-    // 初始化按钮提示
-    updateButtonTooltips();
+    // 添加登录按钮功能
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function() {
+            showCustomAlert('登录功能', '登录功能正在开发中，敬请期待！', 'fa-user');
+        });
+    }
 });
 
 // 创意想法框交互功能
