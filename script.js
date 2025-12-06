@@ -126,7 +126,7 @@ let hairstyleFile = null;
 let ideaText = null;
 
 // === 常量定义 ===
-const WEBHOOK_URL = 'http://localhost:5678/webhook-test/8a97d418-4dee-4e84-bbda-d8aa0ed5ce1f';
+const WEBHOOK_URL = 'https://aimusicmo-n8n.hf.space/webhook-test/8a97d418-4dee-4e84-bbda-d8aa0ed5ce1f';
 const TASK_TYPES = {
     GENERATE_BY_IDEA: '按创意生成',
     GENERATE_BY_HAIRSTYLE: '按发型生成'
