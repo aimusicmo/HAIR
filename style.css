@@ -2326,3 +2326,366 @@ body {
         justify-content: center;
     }
 }
+
+/* === 移动端优化响应式设计 === */
+
+/* 超小屏幕手机优化 */
+@media (max-width: 425px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    .container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    /* 左侧边栏移动端优化 */
+    .left-sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+    }
+    
+    .left-sidebar .logo h1 {
+        font-size: 1.25rem;
+    }
+    
+    .left-sidebar .logo p {
+        font-size: 0.75rem;
+    }
+    
+    .left-sidebar .main-nav a {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .left-sidebar .sidebar-footer .btn {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    /* 主内容区域移动端优化 */
+    .main-content {
+        padding: 1rem;
+        min-height: auto;
+    }
+    
+    .main-content .content-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .main-content .content-header p {
+        font-size: 0.8rem;
+    }
+    
+    /* 上传区域移动端优化 */
+    .upload-area {
+        height: 200px;
+        padding: 1rem;
+    }
+    
+    .upload-area-small {
+        height: 180px;
+        padding: 1rem;
+    }
+    
+    .upload-content h3, .upload-content-small h3 {
+        font-size: 1.1rem;
+    }
+    
+    .upload-content p, .upload-content-small p {
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    /* 两列布局改为单列 */
+    .two-column-section {
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    /* 按钮移动端优化 */
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        min-height: 44px; /* 触摸友好的最小高度 */
+    }
+    
+    .btn-large {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    /* 生成按钮容器 */
+    .generate-btn-container {
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-top: 0.8rem;
+    }
+    
+    /* 右侧边栏移动端优化 */
+    .right-sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        border-left: none;
+        border-top: 1px solid rgba(229, 231, 235, 0.5);
+    }
+    
+    .gallery-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* 发型图片库移动端优化 */
+    .hairstyle-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+    
+    /* 筛选按钮移动端优化 */
+    .style-filter {
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .filter-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    
+    /* 结果展示区域移动端优化 */
+    .result-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .main-result-box {
+        min-height: 300px;
+        padding: 1rem;
+    }
+    
+    .action-panel {
+        padding: 1rem;
+    }
+    
+    .action-panel button {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+    
+    /* 计时器移动端优化 */
+    .timer-display {
+        font-size: 1.5rem;
+        padding: 0.8rem 1.2rem;
+    }
+    
+    .timer-message {
+        font-size: 0.9rem;
+    }
+}
+
+/* 小屏幕手机优化 */
+@media (max-width: 375px) {
+    .left-sidebar {
+        padding: 0.8rem;
+    }
+    
+    .main-content {
+        padding: 0.8rem;
+    }
+    
+    .right-sidebar {
+        padding: 0.8rem;
+    }
+    
+    .upload-area {
+        height: 180px;
+        padding: 0.8rem;
+    }
+    
+    .upload-area-small {
+        height: 160px;
+        padding: 0.8rem;
+    }
+    
+    .hairstyle-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+    
+    .main-result-box {
+        min-height: 250px;
+        padding: 0.8rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .btn-large {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* 超小屏幕手机优化 */
+@media (max-width: 320px) {
+    .left-sidebar .logo h1 {
+        font-size: 1.1rem;
+    }
+    
+    .main-content .content-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .upload-area {
+        height: 160px;
+        padding: 0.6rem;
+    }
+    
+    .upload-area-small {
+        height: 140px;
+        padding: 0.6rem;
+    }
+    
+    .upload-content h3, .upload-content-small h3 {
+        font-size: 1rem;
+    }
+    
+    .upload-content p, .upload-content-small p {
+        font-size: 0.75rem;
+    }
+    
+    .hairstyle-gallery {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .filter-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.65rem;
+    }
+    
+    .main-result-box {
+        min-height: 200px;
+        padding: 0.6rem;
+    }
+    
+    .timer-display {
+        font-size: 1.2rem;
+        padding: 0.6rem 1rem;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        min-height: auto;
+    }
+    
+    .left-sidebar {
+        padding: 0.8rem 1rem;
+    }
+    
+    .left-sidebar .logo {
+        margin-bottom: 1rem;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .upload-area {
+        height: 150px;
+    }
+    
+    .upload-area-small {
+        height: 130px;
+    }
+    
+    .main-result-box {
+        min-height: 200px;
+    }
+    
+    .timer-display {
+        font-size: 1.3rem;
+        padding: 0.6rem 1rem;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover {
+        transform: none;
+    }
+    
+    .gallery-item:hover {
+        transform: none;
+    }
+    
+    .upload-area:hover, .upload-area-small:hover {
+        border-color: #a7f3d0;
+        background-color: #f0fdf4;
+    }
+    
+    .btn:active {
+        transform: scale(0.95);
+    }
+    
+    .gallery-item:active {
+        transform: scale(0.98);
+    }
+}
+
+/* 高DPI屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .upload-area, .upload-area-small {
+        border-width: 1px;
+    }
+    
+    .main-result-box, .action-panel {
+        border-width: 1px;
+    }
+}
+
+/* 减少动画效果（用户偏好） */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 深色模式支持（预留） */
+@media (prefers-color-scheme: dark) {
+    /* 可以在这里添加深色模式样式 */
+}
+
+/* 打印样式优化 */
+@media print {
+    .left-sidebar, .right-sidebar {
+        display: none;
+    }
+    
+    .main-content {
+        width: 100%;
+        padding: 1rem;
+    }
+    
+    .btn, .filter-btn {
+        display: none;
+    }
+}
