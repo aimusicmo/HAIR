@@ -154,15 +154,15 @@ function saveUserUsage(usage) {
 function getDailyFreeStatus() {
     const dailyData = localStorage.getItem(DAILY_FREE_KEY);
     if (!dailyData) {
-        return { freeUsed: 0, totalFree: 2, date: new Date().toDateString() };
+        return { freeUsed: 0, totalFree: 20, date: new Date().toDateString() };
     }
     
     const data = JSON.parse(dailyData);
     const today = new Date().toDateString();
     
-    // 如果是新的一天，重置状态（每天登录获得2次免费机会）
+    // 如果是新的一天，重置状态（每天登录获得20次免费机会）
     if (data.date !== today) {
-        return { freeUsed: 0, totalFree: 2, date: today };
+        return { freeUsed: 0, totalFree: 20, date: today };
     }
     
     return data;
