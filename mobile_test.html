@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端滚动测试</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .iframe-container {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .mobile-view {
+            max-width: 425px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .mobile-view {
+                max-width: 100%;
+            }
+            iframe {
+                height: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-view">
+        <div class="test-info">
+            <h1>📱 移动端滚动测试</h1>
+            <p><strong>测试目标：</strong>验证手机端是否可以正常滚动查看整个网页内容</p>
+            <p><strong>修改内容：</strong></p>
+            <ul>
+                <li>✅ 移动端body设置overflow: auto</li>
+                <li>✅ 移动端container设置overflow: visible</li>
+                <li>✅ 移动端sidebar设置overflow: visible</li>
+            </ul>
+            <p><strong>预期效果：</strong>在移动端视图中，应该可以直接滚动查看左侧菜单、中间内容和右侧发型库的全部内容，无需点击任何按钮。</p>
+        </div>
+        
+        <div class="iframe-container">
+            <iframe src="index.html" title="森林AI发型设计"></iframe>
+        </div>
+    </div>
+</body>
+</html>

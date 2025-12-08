@@ -13,11 +13,29 @@ body {
     overflow: hidden;
 }
 
+/* 移动端允许滚动 */
+@media (max-width: 768px) {
+    body {
+        overflow: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+}
+
 /* 三栏布局容器 */
 .container {
     display: flex;
     height: 100vh;
     overflow: hidden;
+}
+
+/* 移动端容器允许滚动 */
+@media (max-width: 768px) {
+    .container {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
 }
 
 /* 侧边栏通用样式 */
@@ -29,6 +47,14 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
+}
+
+/* 移动端侧边栏允许滚动 */
+@media (max-width: 768px) {
+    .sidebar {
+        height: auto;
+        overflow: visible;
+    }
 }
 
 /* 左侧菜单栏 */
