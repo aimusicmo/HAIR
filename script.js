@@ -379,6 +379,8 @@ let generatedImageBlob = null;
 let currentAbortController = null; // 用于中止fetch请求
 let startTime = null; // 记录开始时间
 let timerInterval = null; // 计时器间隔
+let diyStartTime = null; // DIY开始时间
+let diyTimerInterval = null; // DIY计时器间隔
 
 // === 新增:重置主结果框的函数 ===
 function resetMainResultBox() {
@@ -1072,18 +1074,63 @@ downloadBtn.addEventListener('click', () => {
         return;
     }
 
+    // 直接下载原始图片（不包含时间显示）
     const link = document.createElement('a');
     link.href = URL.createObjectURL(generatedImageBlob);
     link.download = 'AI设计_' + Date.now() + '.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
 });
 
 // === 5. "发型DIY呈现方法"按钮 ===
 hairstyleDIYBtn.addEventListener('click', () => {
     handleHairstyleDIYGeneration();
 });
+
+// === 工具函数:显示DIY计时器 ===
+function showDIYTimer() {
+    // 显示计时器在模态框内容区域
+    const timerHtml = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 1.1rem; color: #6b7280; margin-bottom: 10px; font-weight: 500;">正在生成发型DIY呈现方法，请耐心等待~</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #10b981; font-family: 'Courier New', monospace; min-width: 100px; padding: 1rem 1.5rem; background: linear-gradient(135deg, #f0fdf4 0%, #e6fffa 100%); border-radius: 12px; border: 2px solid #10b981; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); display: inline-block;" id="diyTimerDisplay">00:00</div>
+        </div>
+    `;
+    
+    // 确保textModalContent存在
+    if (textModalContent) {
+        textModalContent.innerHTML = timerHtml;
+    }
+    
+    // 开始计时
+    diyStartTime = Date.now();
+    diyTimerInterval = setInterval(updateDIYTimer, 1000);
+}
+
+// === 工具函数:更新DIY计时器 ===
+function updateDIYTimer() {
+    if (!diyStartTime) return;
+    
+    const elapsed = Math.floor((Date.now() - diyStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    const timerDisplay = document.getElementById('diyTimerDisplay');
+    if (timerDisplay) {
+        timerDisplay.textContent = formattedTime;
+    }
+}
+
+// === 工具函数:停止DIY计时器 ===
+function stopDIYTimer() {
+    if (diyTimerInterval) {
+        clearInterval(diyTimerInterval);
+        diyTimerInterval = null;
+    }
+}
 
 // === 处理发型DIY文字生成的函数 ===
 function handleHairstyleDIYGeneration() {
@@ -1099,10 +1146,10 @@ function handleHairstyleDIYGeneration() {
         return;
     }
     
-    // 显示加载状态
-    textModalContent.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">正在生成发型DIY呈现方法，请稍候...</div>';
+    // 显示模态框和计时器
     textModal.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    showDIYTimer();
     
     // 创建AbortController
     const diyAbortController = new AbortController();
@@ -1147,6 +1194,9 @@ function handleHairstyleDIYGeneration() {
     .then(data => {
         console.log('从 N8N 收到DIY文字响应:', data);
         
+        // 停止DIY计时器
+        stopDIYTimer();
+        
         let displayText = '';
         if (typeof data === 'string') {
             displayText = data;
@@ -1158,11 +1208,17 @@ function handleHairstyleDIYGeneration() {
             displayText = JSON.stringify(data, null, 2);
         }
         
+        // 计算DIY总用时
+        const totalTime = diyStartTime ? Math.floor((Date.now() - diyStartTime) / 1000) : 0;
+        const minutes = Math.floor(totalTime / 60);
+        const seconds = totalTime % 60;
+        const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
         // 显示结果在模态框中
         textModalContent.innerHTML = `
             <div style="white-space: pre-wrap; line-height: 1.8;">${displayText}</div>
             <div style="margin-top: 15px; font-size: 12px; color: #666; text-align: right;">
-                生成时间: ${new Date().toLocaleString()}
+                生成时间: ${new Date().toLocaleString()} | 用时: ${formattedTime}
             </div>
         `;
     })

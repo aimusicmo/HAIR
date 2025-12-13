@@ -915,7 +915,7 @@ body {
 
 .text-modal-body {
     padding: 20px 30px;
-    max-height: 50vh;
+    max-height: 60vh;
     overflow-y: auto;
 }
 
